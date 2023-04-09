@@ -1,0 +1,26 @@
+# Compiled Python files
+*.pyc
+__pycache__/
+
+# Python egg metadata
+*.egg-info/
+*.egg
+
+# Virtual environment
+venv/
+.env
+
+# Build artifacts
+build/
+dist/
+
+# Coverage data
+.coverage
+htmlcov/
+
+# Dependencies
+# Use `pip freeze > requirements.txt` to generate a requirements file.
+# Then, add `requirements.txt` to your .gitignore file.
+# If you're using pipenv, add `Pipfile.lock`.
+requirements.txt
+Pipfile.lock

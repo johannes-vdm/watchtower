@@ -15,12 +15,16 @@ class LatestImageHandler(FileSystemEventHandler):
             print(f"The latest uploaded image is now: {event.src_path}")
             print(f"{event.src_path}")
             img = cv2.imread(f"{event.src_path}")
-            # print(img)
-            config = ('-l eng --oem 1 --psm 3')
-            text = pytesseract.image_to_string(img, config=config)
-            # print text
-            text = text.split('\n')
-            print(text)
+            try:
+                config = ('-l eng --oem 1 --psm 3')
+                text = pytesseract.image_to_string(img, config=config)
+                # print text
+                text = text.split('\n')
+                print(text)
+            except TypeError:
+                print(f"Text could not be extracted: {event.src_path}")
+                return
+
 
 # Create a handler for file system events
 event_handler = LatestImageHandler()

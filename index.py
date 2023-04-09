@@ -2,50 +2,28 @@ import os
 import time
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
-import easyocr
+
+directory = 'media'
 
 
-class Watcher:
-    DIRECTORY_TO_WATCH = "./media"
-
-    def __init__(self):
-        self.observer = Observer()
-
-    def run(self):
-        event_handler = Handler()
-        self.observer.schedule(event_handler, self.DIRECTORY_TO_WATCH, recursive=True)
-        self.observer.start()
-        try:
-            while True:
-                time.sleep(5)
-        except:
-            self.observer.stop()
-            print("Error")
-
-        self.observer.join()
+class LatestImageHandler(FileSystemEventHandler):
+    def on_created(self, event):
+        if not event.is_directory and event.src_path.endswith('.jpg') or event.src_path.endswith('.jpeg') or event.src_path.endswith('.png'):
+            print(f"The latest uploaded image is now: {event.src_path}")
 
 
-class Handler(FileSystemEventHandler):
+# Create a handler for file system events
+event_handler = LatestImageHandler()
 
-    @staticmethod
-    def on_any_event(event):
-        if event.is_directory:
-            return None
+# Create an observer for the directory
+observer = Observer()
+observer.schedule(event_handler, directory, recursive=False)
+observer.start()
 
-        elif event.event_type == 'created':
-            filepath = event.src_path
-            filename, extension = os.path.splitext(filepath)
+try:
+    while True:
+        time.sleep(1)
+except KeyboardInterrupt:
+    observer.stop()
 
-            if extension.lower() in ['.jpg', '.jpeg', '.png', '.bmp']:
-                try:
-                    reader = easyocr.Reader(['en'])
-                    result = reader.readtext(filepath)
-                    text = '\n'.join([text[1] for text in result])
-                    print(text)
-                except Exception as e:
-                    print(e)
-
-
-if __name__ == '__main__':
-    w = Watcher()
-    w.run()
+observer.join()

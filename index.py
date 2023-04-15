@@ -6,6 +6,7 @@ from watchdog.events import FileSystemEventHandler
 import requests
 import json
 
+from PIL import Image
 
 from openai_functions import openai_response
 
@@ -13,7 +14,7 @@ pytesseract.pytesseract.tesseract_cmd = 'C:/Program Files/Tesseract-OCR/tesserac
 directory = 'media'
 initQuestion = ''
 question = None
-url = "http://localhost:3000/api/forward"
+url = "https://express-beacon.herokuapp.com/api/watchtower"
 
 
 class LatestImageHandler(FileSystemEventHandler):
@@ -21,10 +22,13 @@ class LatestImageHandler(FileSystemEventHandler):
         if not event.is_directory and event.src_path.endswith('.jpg') or event.src_path.endswith('.jpeg') or event.src_path.endswith('.png'):
             print(f"The latest uploaded image is now: {event.src_path}")
             print(f"{event.src_path}")
+            # img = Image.open(event.src_path)
             img = cv2.imread(f"{event.src_path}")
+
             question = None
             try:
-                config = ('--psm 6 --oem 3 --dpi 300')
+                config = (
+                    '--psm 3 --oem 3')
                 question = pytesseract.image_to_string(
                     img, lang='eng',  config=config)
                 print(question)
@@ -32,16 +36,17 @@ class LatestImageHandler(FileSystemEventHandler):
 
             except TypeError:
                 print(f"Text could not be extracted: {event.src_path}")
+
             if (question):
                 print(question)
                 # response = text
                 paragraph = '\n'.join(question)
                 response = openai_response(prompt=(paragraph))
-                # data=paragraph
 
                 print(response)
                 payload = json.dumps({
-                    "data": response
+                    "data": response,
+                    "info": paragraph
                 })
                 headers = {
                     'Content-Type': 'application/json'
@@ -51,21 +56,7 @@ class LatestImageHandler(FileSystemEventHandler):
                     "POST", url, headers=headers, data=payload)
 
                 print(response.text)
-
-                # url = "localhost:3000/api/forward"
-
-                # headers = {
-                #     'Content-Type': 'application/json'
-                # }
-
-                # response = requests.request(
-                #     "POST", url, headers=headers, data=payload)
-
-                # print(response.text)
-
             else:
-                # prompt = 'what is the probability of cellular life in the universe?'
-                # openai_response(prompt=prompt)
                 print('no response')
 
 

@@ -1,3 +1,4 @@
+import os
 import time
 import pytesseract
 import cv2
@@ -14,7 +15,8 @@ pytesseract.pytesseract.tesseract_cmd = 'C:/Program Files/Tesseract-OCR/tesserac
 directory = 'media'
 initQuestion = ''
 question = None
-url = "https://express-beacon.herokuapp.com/api/watchtower"
+# beacon_url = "http://localhost:3000/api/watchtower"
+beacon_url = os.environ.get('BEACON_URL')
 
 
 class LatestImageHandler(FileSystemEventHandler):
@@ -53,7 +55,7 @@ class LatestImageHandler(FileSystemEventHandler):
                 }
 
                 response = requests.request(
-                    "POST", url, headers=headers, data=payload)
+                    "POST", beacon_url, headers=headers, data=payload)
 
                 print(response.text)
             else:

@@ -22,5 +22,5 @@ htmlcov/
 # Use `pip freeze > requirements.txt` to generate a requirements file.
 # Then, add `requirements.txt` to your .gitignore file.
 # If you're using pipenv, add `Pipfile.lock`.
-requirements.txt
+# requirements.txt
 Pipfile.lock
